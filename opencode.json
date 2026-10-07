@@ -18,5 +18,26 @@
         }
       }
     }
-  }
+  },
+  "mcp": {
+    "lab-tester": {
+      "type": "stdio",
+      "command": [
+        "python3",
+        "tools/lab_mcp_server.py"
+      ],
+      "enabled": true
+    }
+  },
+  "rules": [
+    { "path": "AGENTS.md" }
+  ],
+  "skills": {
+    "paths": [
+      ".opencode/skills"
+    ]
+  },
+  "plugin": [
+    "file:///home/alex/code/vibecode/.opencode/plugins/auto-tests.js"
+  ]
 }
