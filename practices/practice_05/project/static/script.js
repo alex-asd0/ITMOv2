@@ -178,22 +178,26 @@ function normalizeResult(res) {
 
 async function openWheel() {
   if (getSpinsRemaining(userProfile) <= 0) { openSpinsBanner(); return; }
-  try {
-    const raw = await fetchJSON('/api/spin/pool');
-    currentPool = normalizePool(raw);
-  } catch {
-    currentPool = { segments: [
-      { type: 'emoji', emoji: normalizeEmoji({ code: 'star', version: 'v1', rarity: 'rare', display_name: 'Star', glyph: '⭐' }) },
-      { type: 'emoji', emoji: normalizeEmoji({ code: 'fire', version: 'v1', rarity: 'common', display_name: 'Fire', glyph: '🔥' }) },
-      { type: 'odd_prize', label: 'Скидка на задачи' },
-      { type: 'odd_prize', label: 'Участие в розыгрыше' },
-      { type: 'odd_prize', label: 'Промо-код на кофе' },
-      { type: 'emoji', emoji: normalizeEmoji({ code: 'check', version: 'v1', rarity: 'common', display_name: 'Check', glyph: '✔️' }) },
-      { type: 'odd_prize', label: 'Бессмысленный диплом' },
-      { type: 'odd_prize', label: 'Улыбка от тимлида' }
-    ] };
+  // Do not refresh pool on opening – reuse the last pool to avoid visual change before result announcement.
+  // Fetch only if we have no pool yet (first open).
+  if (!currentPool) {
+    try {
+      const raw = await fetchJSON('/api/spin/pool');
+      currentPool = normalizePool(raw);
+    } catch {
+      currentPool = { segments: [
+        { type: 'emoji', emoji: normalizeEmoji({ code: 'star', version: 'v1', rarity: 'rare', display_name: 'Star', glyph: '⭐' }) },
+        { type: 'emoji', emoji: normalizeEmoji({ code: 'fire', version: 'v1', rarity: 'common', display_name: 'Fire', glyph: '🔥' }) },
+        { type: 'odd_prize', label: 'Скидка на задачи' },
+        { type: 'odd_prize', label: 'Участие в розыгрыше' },
+        { type: 'odd_prize', label: 'Промо-код на кофе' },
+        { type: 'emoji', emoji: normalizeEmoji({ code: 'check', version: 'v1', rarity: 'common', display_name: 'Check', glyph: '✔️' }) },
+        { type: 'odd_prize', label: 'Бессмысленный диплом' },
+        { type: 'odd_prize', label: 'Улыбка от тимлида' }
+      ] };
+    }
+    ensureAtLeastOneEmoji(currentPool);
   }
-  ensureAtLeastOneEmoji(currentPool);
   renderWheel(currentPool);
   const ov = document.getElementById('wheel-overlay');
   if (ov) ov.hidden = false;
