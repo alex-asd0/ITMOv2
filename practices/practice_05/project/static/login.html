@@ -3,53 +3,91 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Вход</title>
+    <meta name="theme-color" content="#fdf5e9" />
+    <title>Вход — Менеджер задач</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <main class="container" style="max-width: 420px; margin-top: 60px;">
-      <h1 style="margin-bottom: 16px;">Вход в аккаунт</h1>
-      <form id="login-form" class="new-task" style="flex-direction: column; align-items: stretch; gap: 12px;">
-        <label>
-          Имя пользователя
-          <input id="login-name" type="text" placeholder="Ваше имя" required />
-        </label>
-        <button type="submit" class="btn primary">Войти</button>
-        <p class="emoji-tip">Создаём профиль, если вы с нами впервые.</p>
-      </form>
+    <main class="auth-page">
+      <div class="auth-card">
+        <div class="auth-wheel" aria-hidden="true"></div>
+        <h1>Привет! Давай за дело</h1>
+        <p class="auth-lead">Выполняй задачи, крути колесо фортуны и собирай коллекцию эмодзи.</p>
+        <form id="login-form" novalidate>
+          <label class="field">
+            <span class="field-label">Имя пользователя</span>
+            <input id="login-name" type="text" placeholder="например, alex_2026" autocomplete="username" maxlength="20" aria-describedby="login-hint login-error" required />
+          </label>
+          <p class="field-hint" id="login-hint">3–20 символов: латиница, цифры и «_». Если вы здесь впервые, мы создадим профиль.</p>
+          <p class="field-error" id="login-error" role="alert"></p>
+          <button type="submit" class="btn btn-primary" id="login-submit">Войти</button>
+        </form>
+        <div class="auth-steps" aria-hidden="true">
+          <span>1. Добавь задачи</span>
+          <span>2. Отмечай готовое</span>
+          <span>3. Крути колесо</span>
+        </div>
+      </div>
     </main>
     <script>
-      async function fetchJSON(url, options) {
-        const res = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, options||{}));
-        const data = res.headers.get('content-type')?.includes('application/json') ? await res.json() : await res.text();
-        if (!res.ok) { const msg = (typeof data === 'object' && data && (data.error || data.message)) || String(data); throw new Error(msg || 'Request failed'); }
-        return data;
-      }
+      const NAME_RE = /^[A-Za-z0-9_]{3,20}$/;
       const form = document.getElementById('login-form');
       const input = document.getElementById('login-name');
-      const STORAGE_AUTH_NAME = 'auth_name';
-      function setAuthName(name) { try { localStorage.setItem(STORAGE_AUTH_NAME, name || ''); } catch {} }
+      const errorEl = document.getElementById('login-error');
+      const submit = document.getElementById('login-submit');
+
+      function showError(message) {
+        errorEl.textContent = message;
+        input.classList.toggle('has-error', !!message);
+        if (message) { input.focus(); input.addEventListener('animationend', () => input.classList.remove('has-error'), { once: true }); }
+      }
+
+      function utcOffset() {
+        const total = -new Date().getTimezoneOffset();
+        const sign = total >= 0 ? '+' : '-';
+        const pad = (n) => String(Math.floor(Math.abs(n))).padStart(2, '0');
+        return `${sign}${pad(total / 60)}:${pad(total % 60)}`;
+      }
+
+      async function fetchJSON(url, options) {
+        const res = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, options || {}));
+        const isJSON = (res.headers.get('content-type') || '').includes('application/json');
+        const data = isJSON ? await res.json() : await res.text();
+        if (!res.ok) {
+          const msg = (typeof data === 'object' && data && (data.error || data.message)) || String(data);
+          throw new Error(msg || 'Request failed');
+        }
+        return data;
+      }
+
+      input.addEventListener('input', () => showError(''));
+
       form.addEventListener('submit', async (ev) => {
         ev.preventDefault();
+        const name = input.value.trim();
+        if (!name) { showError('Введите имя пользователя'); return; }
+        if (!NAME_RE.test(name)) {
+          showError('Имя должно быть от 3 до 20 символов: только латиница, цифры и «_»');
+          return;
+        }
+        submit.disabled = true;
+        submit.textContent = 'Входим…';
         try {
-          const name = input.value.trim();
-          if (!name) { alert('Введите имя'); return; }
           try {
-            await fetchJSON('/api/auth/login', { method: 'POST', body: JSON.stringify({ name }) });
+            await fetchJSON('/api/auth/login', { method: 'POST', body: JSON.stringify({ name, utc_offset: utcOffset() }) });
           } catch (e) {
-            // if backend unavailable, store name locally to preserve invariants and proceed
-            if (!(e && (e.message || '').toLowerCase().includes('invalid'))) {
-              setAuthName(name);
-            } else {
-              throw e;
-            }
+            if ((e.message || '').toLowerCase().includes('invalid')) throw e;
           }
-          setAuthName(name);
+          localStorage.setItem('auth_name', name);
           window.location.href = '/static/index.html';
         } catch (e) {
-          alert('Не удалось выполнить вход: ' + (e?.message || 'unknown'));
+          showError('Не удалось войти. Проверьте имя и попробуйте ещё раз.');
+          submit.disabled = false;
+          submit.textContent = 'Войти';
         }
       });
     </script>
   </body>
-  </html>
+</html>

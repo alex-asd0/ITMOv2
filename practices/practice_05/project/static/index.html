@@ -3,128 +3,174 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fdf5e9" />
     <title>Менеджер задач</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <main class="container">
-      <div class="topbar">
-        <h1>Менеджер задач</h1>
-        <div class="topbar-actions">
-          <span id="spins-indicator" class="spins-indicator" aria-live="polite" title="Оставшиеся крутки"></span>
-          <button id="play-button" class="btn play" aria-label="Играть в колесо фортуны">ИГРАТЬ</button>
-        </div>
-      </div>
-
-      <nav class="view-switch">
-        <button id="view-list" class="btn toggle" aria-pressed="true">Список</button>
-        <button id="view-calendar" class="btn toggle" aria-pressed="false">Календарь недели</button>
-      </nav>
-
-      <form id="new-task-form" class="new-task">
-        <input id="new-task-input" type="text" placeholder="Новая задача" aria-label="Новая задача" />
-        <select id="new-time-mode" aria-label="Режим времени">
-          <option value="none" selected>Без времени</option>
-          <option value="all_day">На весь день</option>
-          <option value="when">Точка во времени</option>
-          <option value="timed">Интервал</option>
-        </select>
-        <span class="time-fields">
-          <input id="new-all-day" type="date" aria-label="Дата (на весь день)" hidden />
-          <input id="new-when" type="datetime-local" aria-label="Время (точка)" hidden />
-          <input id="new-start" type="datetime-local" aria-label="Начало" hidden />
-          <input id="new-end" type="datetime-local" aria-label="Окончание" hidden />
-        </span>
-        <div class="emoji-control">
-          <button type="button" id="new-emoji-btn" class="btn" aria-expanded="false" aria-controls="new-emoji-panel">Добавить эмодзи</button>
-          <div id="new-emoji-panel" class="emoji-panel" hidden aria-label="Выбор эмодзи (новая задача)"></div>
-          <div id="new-emoji-chips" class="emoji-chips" aria-live="polite"></div>
-        </div>
-        <button type="submit" class="btn primary">Добавить</button>
-      </form>
-
-      <section id="list-view">
-        <ul id="task-list" class="tasks"></ul>
-      </section>
-
-      <section id="calendar-view" hidden>
-        <header class="cal-header">
-          <button id="cal-prev" class="btn">Предыдущая</button>
-          <button id="cal-today" class="btn">Эта неделя</button>
-          <button id="cal-next" class="btn">Следующая</button>
-          <span id="cal-title" aria-live="polite" class="cal-title"></span>
-        </header>
-        <div id="calendar" class="calendar"></div>
-        <h2 class="no-time-title">Без времени</h2>
-        <ul id="no-time-list" class="tasks no-time"></ul>
-      </section>
-
-      <!-- Edit Modal -->
-      <div id="edit-modal" class="modal" hidden>
-        <div class="modal-content">
-          <h2>Редактирование задачи</h2>
-          <form id="edit-form">
-            <label>
-              Название
-              <input id="edit-title" type="text" />
-            </label>
-            <label>
-              Режим времени
-              <select id="edit-time-mode">
-                <option value="none">Без времени</option>
-                <option value="all_day">На весь день</option>
-                <option value="when">Точка во времени</option>
-                <option value="timed">Интервал</option>
-              </select>
-            </label>
-            <div class="edit-time-fields">
-              <input id="edit-all-day" type="date" aria-label="Дата (на весь день)" />
-              <input id="edit-when" type="datetime-local" aria-label="Время (when)" />
-              <input id="edit-start" type="datetime-local" aria-label="Начало" />
-              <input id="edit-end" type="datetime-local" aria-label="Окончание" />
-            </div>
-            <div class="edit-emoji">
-              <div class="emoji-control">
-                <div class="emoji-chips" id="edit-emoji-chips"></div>
-                <button type="button" id="edit-emoji-add-btn" class="btn" aria-expanded="false" aria-controls="edit-emoji-panel">Добавить ещё эмодзи</button>
-                <div id="edit-emoji-panel" class="emoji-panel" hidden aria-label="Выбор эмодзи (редактирование)"></div>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button type="button" id="edit-delete" class="btn danger">Удалить</button>
-              <button type="submit" class="btn primary">Сохранить</button>
-              <button type="button" id="edit-cancel" class="btn">Отмена</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Spins limit banner -->
-      <div id="spins-banner" class="overlay" role="dialog" aria-modal="true" aria-labelledby="spins-banner-title" hidden>
-        <div class="overlay-content">
-          <h2 id="spins-banner-title" style="font-size: 32px; margin-top: 0;">Лимит круток исчерпан</h2>
-          <p style="font-size: 20px; line-height: 1.6;">Чтобы продлить лимит — переведите деньги на наш b2c стартап. Возвращайтесь после полуночи по вашему времени.</p>
-          <button class="btn primary" id="spins-banner-close" style="font-size: 16px; padding: 10px 16px;">Понятно</button>
-        </div>
-      </div>
-
-      <!-- Wheel overlay -->
-      <div id="wheel-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="wheel-title" hidden>
-        <div class="overlay-content wheel-modal">
-          <div class="wheel-header">
-            <h2 id="wheel-title">Колесо фортуны</h2>
-            <button class="btn" id="wheel-close" aria-label="Закрыть">Закрыть</button>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" data-icon="check" aria-hidden="true"></div>
+          <div>
+            <h1>Менеджер задач</h1>
+            <p id="today-date"></p>
           </div>
-          <div class="wheel-wrap">
-            <div class="wheel-pointer" aria-hidden="true"></div>
-            <div id="wheel" class="wheel" aria-label="Колесо со списком призов"></div>
-            <button id="wheel-spin" class="btn primary wheel-center" aria-label="Крутить">КРУТИТЬ</button>
-          </div>
-          <div id="wheel-legend" class="wheel-legend" aria-live="polite"></div>
         </div>
+        <div class="user-chip">
+          <div class="avatar" id="user-avatar" aria-hidden="true"></div>
+          <span class="user-name" id="user-name"></span>
+          <button type="button" id="logout" class="btn btn-ghost btn-icon" aria-label="Выйти" title="Выйти" data-icon="logout"></button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-label="Обзор дня и игра">
+          <div class="progress-card" id="progress-card">
+            <div class="ring" role="img" id="ring" aria-label="Прогресс дня">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="ring-track" cx="50" cy="50" r="42"></circle>
+                <circle class="ring-value" id="ring-value" cx="50" cy="50" r="42"></circle>
+              </svg>
+              <div class="ring-label"><div><span id="ring-percent">0%</span><small>сегодня</small></div></div>
+            </div>
+            <div class="progress-text">
+              <span class="progress-eyebrow" id="greeting"></span>
+              <h2 id="progress-title" aria-live="polite"></h2>
+              <p class="progress-sub" id="progress-sub"></p>
+            </div>
+          </div>
+
+          <section class="game-card" aria-label="Колесо фортуны">
+            <div class="game-head">
+              <span class="game-eyebrow">Колесо фортуны</span>
+              <span class="game-count" id="spins-label" aria-live="polite"></span>
+            </div>
+            <div class="coins" id="spins-coins" role="img" aria-label="Крутки"></div>
+            <p class="game-hint" id="game-hint"></p>
+            <div class="game-actions">
+              <button type="button" id="play-button" class="btn btn-gold" aria-label="Играть в колесо фортуны">Играть</button>
+              <button type="button" id="open-collection" class="btn btn-glass">
+                <span data-icon="sparkle"></span> Коллекция <span class="badge-count" id="collection-count">0/0</span>
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <form id="new-task-form" class="card composer" novalidate>
+          <div class="composer-row">
+            <input id="new-task-input" type="text" maxlength="200" autocomplete="off" placeholder="Что нужно сделать?" aria-label="Новая задача" />
+            <div id="new-emoji-slots" class="emoji-slots" aria-label="Эмодзи для задачи"></div>
+            <button type="button" id="new-time-toggle" class="chip-btn" aria-expanded="false" aria-controls="new-time-panel">
+              <span data-icon="calendar"></span><span id="new-time-summary">Без времени</span>
+            </button>
+            <button type="submit" class="btn btn-primary"><span data-icon="plus"></span> Добавить</button>
+          </div>
+          <div id="new-time-panel" class="composer-panel" hidden></div>
+        </form>
+
+        <div class="tabs" role="tablist" aria-label="Режим просмотра">
+          <button type="button" role="tab" id="tab-list" class="tab" aria-selected="true" aria-controls="list-view">Список</button>
+          <button type="button" role="tab" id="tab-calendar" class="tab" aria-selected="false" aria-controls="calendar-view">Календарь недели</button>
+        </div>
+
+        <section id="list-view" role="tabpanel" aria-labelledby="tab-list"></section>
+
+        <section id="calendar-view" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+          <header class="cal-head">
+            <button type="button" id="cal-prev" class="btn btn-icon" aria-label="Предыдущая неделя" data-icon="chevron-left"></button>
+            <button type="button" id="cal-next" class="btn btn-icon" aria-label="Следующая неделя" data-icon="chevron-right"></button>
+            <button type="button" id="cal-today" class="btn">Эта неделя</button>
+            <h2 id="cal-title" class="cal-title" aria-live="polite"></h2>
+          </header>
+          <div id="calendar" class="calendar"></div>
+          <div id="no-time-section"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Редактирование задачи -->
+    <div id="edit-modal" class="layer" hidden>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="edit-heading">
+        <div class="dialog-head">
+          <h2 id="edit-heading">Редактирование задачи</h2>
+          <button type="button" class="btn btn-ghost btn-icon" id="edit-close" aria-label="Закрыть" data-icon="x"></button>
+        </div>
+        <form id="edit-form" novalidate>
+          <label class="field">
+            <span class="field-label">Название</span>
+            <input id="edit-title" type="text" maxlength="200" autocomplete="off" />
+          </label>
+          <div class="field">
+            <span class="field-label">Когда</span>
+            <div id="edit-time"></div>
+          </div>
+          <div class="field">
+            <span class="field-label">Эмодзи</span>
+            <div id="edit-emoji-slots" class="emoji-slots"></div>
+          </div>
+          <div class="dialog-actions">
+            <button type="button" id="edit-delete" class="btn btn-danger"><span data-icon="trash"></span> Удалить</button>
+            <span class="spacer"></span>
+            <button type="button" id="edit-cancel" class="btn">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+          </div>
+        </form>
       </div>
-    </main>
+    </div>
+
+    <!-- Колесо фортуны -->
+    <div id="wheel-overlay" class="layer is-game" hidden>
+      <div class="dialog is-game wheel-dialog" role="dialog" aria-modal="true" aria-labelledby="wheel-title">
+        <div class="dialog-head">
+          <h2 id="wheel-title">Колесо фортуны</h2>
+          <button type="button" class="btn btn-ghost btn-icon" id="wheel-close" aria-label="Закрыть" data-icon="x"></button>
+        </div>
+        <div id="wheel-stage">
+          <p class="wheel-caption" id="wheel-caption" aria-live="polite"></p>
+          <div class="wheel-wrap" id="wheel-wrap">
+            <div class="wheel-rim" id="wheel-rim" aria-hidden="true"></div>
+            <div class="wheel-pointer" aria-hidden="true">
+              <svg viewBox="0 0 38 46"><path d="M19 44 4 18A17 17 0 1 1 34 18Z" fill="#ffc233" stroke="#8a4a00" stroke-width="3" stroke-linejoin="round"/><circle cx="19" cy="17" r="6" fill="#8a4a00"/></svg>
+            </div>
+            <div id="wheel" class="wheel" role="img" aria-label="Колесо с призами"></div>
+            <button type="button" id="wheel-spin" class="wheel-spin" aria-label="Крутить колесо">Крутить</button>
+          </div>
+        </div>
+        <div id="wheel-result" class="result" hidden aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Лимит круток -->
+    <div id="spins-banner" class="layer is-game" hidden>
+      <div class="dialog is-game banner-dialog" role="dialog" aria-modal="true" aria-labelledby="spins-banner-title">
+        <div class="banner-icon" data-icon="moon" aria-hidden="true"></div>
+        <h2 id="spins-banner-title">Лимит круток исчерпан</h2>
+        <p>Чтобы продлить лимит — переведите деньги на наш b2c стартап. Возвращайтесь после полуночи по вашему времени.</p>
+        <div class="banner-timer">
+          <small>Новые крутки через</small>
+          <strong class="js-reset-timer">--:--:--</strong>
+        </div>
+        <div><button type="button" class="btn btn-gold" id="spins-banner-close">Понятно</button></div>
+      </div>
+    </div>
+
+    <!-- Коллекция эмодзи -->
+    <div id="collection-modal" class="layer is-game" hidden>
+      <div class="dialog is-game collection-dialog" role="dialog" aria-modal="true" aria-labelledby="collection-title">
+        <div class="dialog-head">
+          <h2 id="collection-title">Коллекция эмодзи</h2>
+          <button type="button" class="btn btn-ghost btn-icon" id="collection-close" aria-label="Закрыть" data-icon="x"></button>
+        </div>
+        <div id="collection-body"></div>
+      </div>
+    </div>
+
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+    <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
 
     <script src="/static/script.js"></script>
   </body>
-  </html>
+</html>
