@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Менеджер задач</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <div class="topbar">
+        <h1>Менеджер задач</h1>
+        <div class="topbar-actions">
+          <span id="spins-indicator" class="spins-indicator" aria-live="polite" title="Оставшиеся крутки"></span>
+          <button id="play-button" class="btn play" aria-label="Играть в колесо фортуны">ИГРАТЬ</button>
+        </div>
+      </div>
+
+      <nav class="view-switch">
+        <button id="view-list" class="btn toggle" aria-pressed="true">Список</button>
+        <button id="view-calendar" class="btn toggle" aria-pressed="false">Календарь недели</button>
+      </nav>
+
+      <form id="new-task-form" class="new-task">
+        <input id="new-task-input" type="text" placeholder="Новая задача" aria-label="Новая задача" />
+        <select id="new-time-mode" aria-label="Режим времени">
+          <option value="none" selected>Без времени</option>
+          <option value="all_day">На весь день</option>
+          <option value="when">Точка во времени</option>
+          <option value="timed">Интервал</option>
+        </select>
+        <span class="time-fields">
+          <input id="new-all-day" type="date" aria-label="Дата (на весь день)" hidden />
+          <input id="new-when" type="datetime-local" aria-label="Время (точка)" hidden />
+          <input id="new-start" type="datetime-local" aria-label="Начало" hidden />
+          <input id="new-end" type="datetime-local" aria-label="Окончание" hidden />
+        </span>
+        <div class="emoji-control">
+          <button type="button" id="new-emoji-btn" class="btn" aria-expanded="false" aria-controls="new-emoji-panel">Добавить эмодзи</button>
+          <div id="new-emoji-panel" class="emoji-panel" hidden aria-label="Выбор эмодзи (новая задача)"></div>
+          <div id="new-emoji-chips" class="emoji-chips" aria-live="polite"></div>
+        </div>
+        <button type="submit" class="btn primary">Добавить</button>
+      </form>
+
+      <section id="list-view">
+        <ul id="task-list" class="tasks"></ul>
+      </section>
+
+      <section id="calendar-view" hidden>
+        <header class="cal-header">
+          <button id="cal-prev" class="btn">Предыдущая</button>
+          <button id="cal-today" class="btn">Эта неделя</button>
+          <button id="cal-next" class="btn">Следующая</button>
+          <span id="cal-title" aria-live="polite" class="cal-title"></span>
+        </header>
+        <div id="calendar" class="calendar"></div>
+        <h2 class="no-time-title">Без времени</h2>
+        <ul id="no-time-list" class="tasks no-time"></ul>
+      </section>
+
+      <!-- Edit Modal -->
+      <div id="edit-modal" class="modal" hidden>
+        <div class="modal-content">
+          <h2>Редактирование задачи</h2>
+          <form id="edit-form">
+            <label>
+              Название
+              <input id="edit-title" type="text" />
+            </label>
+            <label>
+              Режим времени
+              <select id="edit-time-mode">
+                <option value="none">Без времени</option>
+                <option value="all_day">На весь день</option>
+                <option value="when">Точка во времени</option>
+                <option value="timed">Интервал</option>
+              </select>
+            </label>
+            <div class="edit-time-fields">
+              <input id="edit-all-day" type="date" aria-label="Дата (на весь день)" />
+              <input id="edit-when" type="datetime-local" aria-label="Время (when)" />
+              <input id="edit-start" type="datetime-local" aria-label="Начало" />
+              <input id="edit-end" type="datetime-local" aria-label="Окончание" />
+            </div>
+            <div class="edit-emoji">
+              <div class="emoji-control">
+                <div class="emoji-chips" id="edit-emoji-chips"></div>
+                <button type="button" id="edit-emoji-add-btn" class="btn" aria-expanded="false" aria-controls="edit-emoji-panel">Добавить ещё эмодзи</button>
+                <div id="edit-emoji-panel" class="emoji-panel" hidden aria-label="Выбор эмодзи (редактирование)"></div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" id="edit-delete" class="btn danger">Удалить</button>
+              <button type="submit" class="btn primary">Сохранить</button>
+              <button type="button" id="edit-cancel" class="btn">Отмена</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Spins limit banner -->
+      <div id="spins-banner" class="overlay" role="dialog" aria-modal="true" aria-labelledby="spins-banner-title" hidden>
+        <div class="overlay-content">
+          <h2 id="spins-banner-title" style="font-size: 32px; margin-top: 0;">Лимит круток исчерпан</h2>
+          <p style="font-size: 20px; line-height: 1.6;">Чтобы продлить лимит — переведите деньги на наш b2c стартап. Возвращайтесь после полуночи по вашему времени.</p>
+          <button class="btn primary" id="spins-banner-close" style="font-size: 16px; padding: 10px 16px;">Понятно</button>
+        </div>
+      </div>
+
+      <!-- Wheel overlay -->
+      <div id="wheel-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="wheel-title" hidden>
+        <div class="overlay-content wheel-modal">
+          <div class="wheel-header">
+            <h2 id="wheel-title">Колесо фортуны</h2>
+            <button class="btn" id="wheel-close" aria-label="Закрыть">Закрыть</button>
+          </div>
+          <div class="wheel-wrap">
+            <div class="wheel-pointer" aria-hidden="true"></div>
+            <div id="wheel" class="wheel" aria-label="Колесо со списком призов"></div>
+            <button id="wheel-spin" class="btn primary wheel-center" aria-label="Крутить">КРУТИТЬ</button>
+          </div>
+          <div id="wheel-legend" class="wheel-legend" aria-live="polite"></div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/script.js"></script>
+  </body>
+  </html>
