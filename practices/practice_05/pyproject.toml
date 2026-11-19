@@ -1,2 +1,2 @@
 [tool.vercel]
-entrypoint = "project.app:app"
+entrypoint = "practices.practice_05.project.app:app"
