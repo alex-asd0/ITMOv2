@@ -1,0 +1,172 @@
+{
+  "name": "ai-classificator",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Classify this GitHub Issue into one type.\n\nTypes:\n- bug: something works incorrectly; has steps, expected vs actual, version.\n- task: a question about existing functionality; answered by a comment or docs link.\n- feature: a request for new behavior and why it is needed.\n- unknown: too vague to decide, or mixes several types.\n\nGive confidence from 0 to 1: how sure you are about the type.\n\nTitle: {{ $json.body_issue_title }}\nBody: {{ $json.body_issue_body }}",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        -640,
+        272
+      ],
+      "id": "91c97efc-577b-4008-8f7c-09abc2e74a81",
+      "name": "AI-классификатор"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        432
+      ],
+      "id": "79f722a3-fca6-4640-bfb6-7d9e26b6b474",
+      "name": "Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "HJHuQ3ultSngKGhI",
+          "name": "OpenAI account 887"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"type\": \"bug\",\n  \"confidence\": 0.91\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -512,
+        496
+      ],
+      "id": "a640828d-aafb-4f98-8fa5-4702d2694652",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a8b0312-62c2-4e03-959b-f68b9d7e7384",
+              "name": "output_confidence",
+              "value": "={{ $json.output.confidence }}",
+              "type": "number"
+            },
+            {
+              "id": "e377ce0d-854d-424e-a274-49e5738c97cd",
+              "name": "output_type",
+              "value": "={{ $json.output.type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        272
+      ],
+      "id": "59d19c55-c936-498a-9e27-afbeeffbe88a",
+      "name": "Return"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "body_issue_title",
+              "type": "any"
+            },
+            {
+              "name": "body_issue_body",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "dd80c1c1-de45-4869-9150-e0d7b13eb2d1",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -848,
+        272
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI-классификатор",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI-классификатор",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "AI-классификатор",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI-классификатор": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "45469fa8-c086-414d-bead-5eaa5a1e8ae8",
+  "meta": {
+    "instanceId": "f4300700b5a89163b88ad6a908ff9e3076c705e8b03a3f40f03ff2f29f7e4289"
+  },
+  "nodeGroups": [],
+  "id": "VgPaN6vqKwZ1PkC3",
+  "tags": []
+}

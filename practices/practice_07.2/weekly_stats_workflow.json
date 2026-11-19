@@ -1,0 +1,850 @@
+{
+  "name": "7.2 WF2 — Weekly Issue Stats → Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 9 * * MON"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        896,
+        1440
+      ],
+      "id": "6f63b75c-f536-4e75-a640-676b84d1ee24",
+      "name": "Cron Weekly"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst end = new Date(now);\nconst start = new Date(now);\nstart.setDate(start.getDate() - 7);\nconst fmt = (d) => d.toISOString().slice(0,10);\nfor (const item of items){\n  item.json.startDate = fmt(start);\n  item.json.endDate = fmt(end);\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        1440
+      ],
+      "id": "7687c3dc-685f-407b-8e37-f879ba65a659",
+      "name": "Compute Range"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d1f24a8-0a9e-41a4-a68d-9f0b3589c9a1",
+              "name": "owner",
+              "value": "alex-asd0",
+              "type": "string"
+            },
+            {
+              "id": "f7e9f4b2-148e-4f34-91f5-3f7fb5f6b4f0",
+              "name": "repo",
+              "value": "ITMOv2",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        1440
+      ],
+      "id": "d331f80c-2fc6-41fd-b643-fec59490b99d",
+      "name": "Owner/Repo"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/search/issues?q=repo:{{ $json.owner }}/{{ $json.repo }}+is:issue+created:>={{ $json.startDate }}+created:<={{ $json.endDate }}+label:bug&per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        1232
+      ],
+      "id": "bef8e8d3-9638-45a9-a1e7-6a6e72fbd857",
+      "name": "Issues bug",
+      "credentials": {
+        "githubApi": {
+          "id": "JFSQfE99tUxJTstF",
+          "name": "GitHub account 30"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/search/issues?q=repo:{{ $json.owner }}/{{ $json.repo }}+is:issue+created:{{ $json.startDate }}..{{ $json.endDate }}+label:task&per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        1392
+      ],
+      "id": "ea05a249-b1e9-4ec2-98e9-29be59311546",
+      "name": "Issues task",
+      "credentials": {
+        "githubApi": {
+          "id": "JFSQfE99tUxJTstF",
+          "name": "GitHub account 30"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/search/issues?q=repo:{{ $json.owner }}/{{ $json.repo }}+is:issue+created:{{ $json.startDate }}..{{ $json.endDate }}+label:feature-request&per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        1552
+      ],
+      "id": "aaf509c5-f464-4562-b361-4a80cc4778e6",
+      "name": "Issues feature",
+      "credentials": {
+        "githubApi": {
+          "id": "JFSQfE99tUxJTstF",
+          "name": "GitHub account 30"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/search/issues?q=repo:{{ $json.owner }}/{{ $json.repo }}+is:issue+created:{{ $json.startDate }}..{{ $json.endDate }}+label:needs-triage&per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        1712
+      ],
+      "id": "c0d1f530-f365-4ca1-ad63-882f9c46964a",
+      "name": "Issues triage",
+      "credentials": {
+        "githubApi": {
+          "id": "JFSQfE99tUxJTstF",
+          "name": "GitHub account 30"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        1312
+      ],
+      "id": "bb58cbf2-8dbd-4b4e-9eca-e22559409c90",
+      "name": "Merge bug+task"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        1632
+      ],
+      "id": "31ec9737-1092-4920-b7aa-7b4b29daa13a",
+      "name": "Merge feat+triage"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        1472
+      ],
+      "id": "e02074ac-0e89-467f-8509-ee22e40708e0",
+      "name": "Merge all"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        1568
+      ],
+      "id": "e9cfd97d-6f72-43ba-abe5-c2987622d522",
+      "name": "Join current + last"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node: Group stats + collect sample issues for AI\n// Input: merged stream of GitHub Search API items (splitIntoItems = true)\n// Output: single item with weekly digest fields and issuesSample[]\n\nfunction fmt(d) { return d.toISOString().slice(0, 10); }\nfunction clip(s, n = 220){ if (!s) return ''; s = String(s); return s.length > n ? s.slice(0, n) + '…' : s; }\n\nconst now = new Date();\nconst end = new Date(now);\nconst start = new Date(now);\nstart.setDate(start.getDate() - 7);\n\nconst perType = { bug: 0, task: 0, feature: 0, 'needs-triage': 0 };\nconst perAuthor = {};\nconst issuesSample = [];\n\nfor (const item of items) {\n  const t = item.json.type || 'unknown';\n  if (perType[t] !== undefined) perType[t]++;\n\n  const author = item.json.author || 'unknown';\n  if (!perAuthor[author]) perAuthor[author] = { bug: 0, task: 0, feature: 0, 'needs-triage': 0, total: 0 };\n  if (perAuthor[author][t] !== undefined) perAuthor[author][t]++;\n  perAuthor[author].total++;\n\n  if (issuesSample.length < 20) {\n    issuesSample.push({\n      type: t,\n      author,\n      title: item.json.title || '',\n      body: clip(item.json.body || ''),\n      number: item.json.number || null,\n      url: item.json.url || item.json.html_url || ''\n    });\n  }\n}\n\nconst total = perType.bug + perType.task + perType.feature + perType['needs-triage'];\n\nreturn [{ json: { perType, perAuthor, total, startDate: fmt(start), endDate: fmt(end), issuesSample } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        1472
+      ],
+      "id": "7c61c58d-5cfd-45a6-97be-67b7517f6d15",
+      "name": "Group stats"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node: Compute Δ & HTML (single item result)\n// Inputs:\n//  - Input 0: текущая неделя из Group stats (perType/perAuthor как объект; может прийти строкой)\n//  - Input 1: последняя запись из Data Table (строки JSON)\n// Output (строго 1 item):\n//  {\n//    table: 'weekly',\n//    startDate, endDate,\n//    perType: stringified JSON,\n//    perAuthor: stringified JSON,\n//    perTypeObj: object,\n//    perAuthorObj: object,\n//    total: number,\n//    delta: { bug, task, feature, 'needs-triage', total },\n//    issuesSample: [...],\n//    html: string (таблицы + список issues)\n//  }\n\nfunction parseJSONDeep(value, fallback, maxDepth = 2) {\n  if (value == null) return fallback;\n  let v = value;\n  for (let i = 0; i < maxDepth; i++) {\n    if (typeof v === 'string') {\n      try { v = JSON.parse(v); continue; } catch { break; }\n    }\n    break;\n  }\n  if (v == null) return fallback;\n  if (typeof v === 'object') return v;\n  return fallback;\n}\n\n// Heuristics to distinguish current vs previous when оба приходят в один вход (после Merge)\nfunction looksLikePrev(obj) {\n  if (!obj || typeof obj !== 'object') return false;\n  // Признаки записи из DataTable: есть id/createdAt/updatedAt, perType как строка, нет issuesSample\n  if (typeof obj.id !== 'undefined') return true;\n  if (typeof obj.createdAt === 'string' || typeof obj.updatedAt === 'string') return true;\n  if (typeof obj.perType === 'string' && !Array.isArray(obj.issuesSample)) return true;\n  return false;\n}\n\n// Determine current and previous payloads\nlet cur = (items[0] && items[0].json) || {};\nlet prevRow = null;\n\nif (items.length >= 2) {\n  const a = items[0]?.json || {};\n  const b = items[1]?.json || {};\n  const aPrev = looksLikePrev(a);\n  const bPrev = looksLikePrev(b);\n  if (aPrev && !bPrev) { prevRow = a; cur = b; }\n  else if (!aPrev && bPrev) { prevRow = b; cur = a; }\n  else {\n    // неоднозначно: считаем items[0] текущим, items[1] прошлым\n    cur = a; prevRow = b;\n  }\n} else {\n  // Совместимость со старой схемой: прошлую неделю берём из второго входа\n  const prevItems = $input.all(1);\n  prevRow = prevItems[0]?.json || null;\n}\n\nconst issuesSample = Array.isArray(cur.issuesSample) ? cur.issuesSample : [];\n\n// Normalize current aggregates (may arrive as object or JSON string)\n// Prefer explicit object fields if предыдущая нода их передаёт (perTypeObj/perAuthorObj)\nconst curPerType = (cur.perTypeObj && typeof cur.perTypeObj === 'object')\n  ? cur.perTypeObj\n  : (parseJSONDeep(cur.perType, cur.perType) || { bug: 0, task: 0, feature: 0, 'needs-triage': 0 });\nconst curPerAuthor = (cur.perAuthorObj && typeof cur.perAuthorObj === 'object')\n  ? cur.perAuthorObj\n  : (parseJSONDeep(cur.perAuthor, cur.perAuthor) || {});\nconst curTotal = Number(cur.total ?? (curPerType.bug||0) + (curPerType.task||0) + (curPerType.feature||0) + (curPerType['needs-triage']||0));\n\n// Normalize previous aggregates (stored as JSON strings in DB)\nconst prevPerType = prevRow ? parseJSONDeep(prevRow.perType, null) : null;\nconst prevTotal = prevRow ? Number(prevRow.total || 0) : null;\n\n// Compute delta safely\nconst delta = (prevPerType && typeof prevPerType === 'object') ? {\n  bug: (curPerType.bug || 0) - (prevPerType.bug || 0),\n  task: (curPerType.task || 0) - (prevPerType.task || 0),\n  feature: (curPerType.feature || 0) - (prevPerType.feature || 0),\n  'needs-triage': (curPerType['needs-triage'] || 0) - (prevPerType['needs-triage'] || 0),\n  total: curTotal - (prevTotal || 0),\n} : { bug: null, task: null, feature: null, 'needs-triage': null, total: null };\n\n// HTML tables\nconst typeRows = Object.entries(curPerType)\n  .map(([k, v]) => {\n    const d = delta[k];\n    const dStr = (d === null || d === undefined) ? 'N/A' : `${d >= 0 ? '+' : ''}${d}`;\n    return `<tr><td>${k}</td><td>${v}</td><td>${dStr}</td></tr>`;\n  })\n  .join('');\n\nconst authorRows = Object.entries(curPerAuthor)\n  .map(([author, c]) => `<tr><td>${author}</td><td>${c.bug||0}</td><td>${c.task||0}</td><td>${c.feature||0}</td><td>${c['needs-triage']||0}</td><td>${c.total||0}</td></tr>`)\n  .join('');\n\nconst issuesList = issuesSample.map(i => {\n  const safe = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');\n  const title = safe(i.title || '(no title)');\n  const body = safe((i.body || '').split('\\n').slice(0,4).join(' '));\n  const url = safe(i.url || '');\n  const t = safe(i.type || 'unknown');\n  return `<li>[${t}] <a href=\"${url}\">${title}</a> — ${body}</li>`;\n}).join('');\n\nconst html = `\n  <h2>Weekly Issue Stats (${cur.startDate} .. ${cur.endDate})</h2>\n  <h3>By type</h3>\n  <table border=1 cellpadding=6 cellspacing=0>\n    <thead><tr><th>Type</th><th>Count</th><th>Δ</th></tr></thead>\n    <tbody>${typeRows}</tbody>\n  </table>\n  <h3>By author</h3>\n  <table border=1 cellpadding=6 cellspacing=0>\n    <thead><tr><th>Author</th><th>bug</th><th>task</th><th>feature</th><th>needs-triage</th><th>Total</th></tr></thead>\n    <tbody>${authorRows}</tbody>\n  </table>\n  <h3>Issues sample</h3>\n  <ol>${issuesList}</ol>\n`;\n\n// Prepare string fields for DB\nconst perTypeStr = JSON.stringify(curPerType);\nconst perAuthorStr = JSON.stringify(curPerAuthor);\n\nreturn [{ json: {\n  table: 'weekly',\n  startDate: cur.startDate,\n  endDate: cur.endDate,\n  // Strings for DB\n  perType: perTypeStr,\n  perAuthor: perAuthorStr,\n  // Objects for AI/logic\n  perTypeObj: curPerType,\n  perAuthorObj: curPerAuthor,\n  total: curTotal,\n  delta,\n  issuesSample,\n  html,\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2416,
+        1472
+      ],
+      "id": "ff64e8e1-93fa-4c5f-b6a8-d386c0b9f599",
+      "name": "Compute Δ & HTML"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HGIWxkA8NyeZCK2Y",
+          "mode": "list",
+          "cachedResultName": "issues-types-count",
+          "cachedResultUrl": "/projects/tXzhzGwuzXrau0rC/datatables/HGIWxkA8NyeZCK2Y"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "endDate",
+              "keyValue": "={{ $json.startDate }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        1648
+      ],
+      "id": "d58d88ff-737a-4d18-980d-0b42d63fcc40",
+      "name": "DT Get last"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "HGIWxkA8NyeZCK2Y",
+          "mode": "list",
+          "cachedResultName": "issues-types-count",
+          "cachedResultUrl": "/projects/tXzhzGwuzXrau0rC/datatables/HGIWxkA8NyeZCK2Y"
+        },
+        "columns": {
+          "0": {
+            "column": "startDate",
+            "value": "={{ $json.startDate }}"
+          },
+          "1": {
+            "column": "endDate",
+            "value": "={{ $json.endDate }}"
+          },
+          "2": {
+            "column": "perType",
+            "value": "={{ $json.perType }}"
+          },
+          "3": {
+            "column": "perAuthor",
+            "value": "={{ $json.perAuthor }}"
+          },
+          "4": {
+            "column": "total",
+            "value": "={{ $json.total }}"
+          },
+          "5": {
+            "column": "createdAt",
+            "value": "={{ new Date().toISOString() }}"
+          },
+          "mappingMode": "defineBelow",
+          "value": {
+            "startDate": "={{ $json.startDate }}",
+            "endDate": "={{ $json.endDate }}",
+            "perType": "={{ $json.perType }}",
+            "perAuthor": "={{ $json.perAuthor }}",
+            "total": "={{ $json.total }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "startDate",
+              "displayName": "startDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "endDate",
+              "displayName": "endDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "perType",
+              "displayName": "perType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "perAuthor",
+              "displayName": "perAuthor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total",
+              "displayName": "total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        1360
+      ],
+      "id": "7144a027-1044-41de-820b-fc16a09f40a8",
+      "name": "DT Insert current"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node: Build AI Context with issues\n// Входы:\n//  - Input 0: результат из compute_delta_and_html_strings (perTypeObj, perAuthorObj, delta, html, issuesSample, даты)\n//  - (опционально) Input 1: результат Group stats (если нужно больше контекста)\n// Выход: один элемент с полем aiContext (string) + пробрасываем html, даты и агрегаты\n\nfunction lineSafe(s) {\n  if (s == null) return '';\n  s = String(s);\n  return s.replace(/\\r/g, '').replace(/\\n/g, ' ');\n}\n\nconst cur = (items[0] && items[0].json) || {};\nconst perType = cur.perTypeObj || cur.perType || {};\nconst perAuthor = cur.perAuthorObj || cur.perAuthor || {};\nconst delta = cur.delta || {};\nconst total = Number(cur.total || 0);\nconst startDate = cur.startDate;\nconst endDate = cur.endDate;\nconst issuesSample = Array.isArray(cur.issuesSample) ? cur.issuesSample : [];\n\nconst typesSummary = `bug=${perType.bug||0}, task=${perType.task||0}, feature=${perType.feature||0}, needs-triage=${perType['needs-triage']||0}, total=${total}`;\nconst deltaSummary = (delta.total === null || delta.total === undefined)\n  ? 'N/A (нет прошлой недели в БД)'\n  : `Δ total=${delta.total}; bug=${delta.bug}, task=${delta.task}, feature=${delta.feature}, needs-triage=${delta['needs-triage']}`;\n\n// Топ авторов по total\nconst authorsSorted = Object.entries(perAuthor)\n  .sort((a,b)=> (b[1]?.total||0) - (a[1]?.total||0))\n  .slice(0,5)\n  .map(([name,c])=> `${name}: total=${c.total||0} (bug=${c.bug||0}, task=${c.task||0}, feature=${c.feature||0}, needs-triage=${c['needs-triage']||0})`)\n  .join('; ');\n\n// Сформируем список примеров issues: [type] title — first 220 chars of body\nconst issueLines = issuesSample.map(i => {\n  const t = i.type || 'unknown';\n  const title = lineSafe(i.title || '(no title)');\n  const body = lineSafe(i.body || '');\n  return `[${t}] ${title} — ${body}`;\n});\n\nconst aiContext = [\n  `Период: ${startDate} .. ${endDate}`,\n  `Типы: ${typesSummary}`,\n  `Изменения: ${deltaSummary}`,\n  `Топ авторов: ${authorsSorted}`,\n  `Примеры issues:`,\n  ...issueLines,\n].join('\\n');\n\nreturn [{ json: {\n  startDate, endDate,\n  perTypeObj: perType,\n  perAuthorObj: perAuthor,\n  perType: cur.perType,         // строка — если нужно в письме или записи\n  perAuthor: cur.perAuthor,     // строка — если нужно в письме или записи\n  total, delta,\n  html: cur.html,\n  aiContext,\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2704,
+        1648
+      ],
+      "id": "6c680214-373e-4b8a-a5ab-c8376e03fdb1",
+      "name": "Build AI Context"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ты — аналитик репозитория. На основе статистики за неделю и изменений относительно прошлой недели напиши краткий дайджест на примерно 10 предложений.\\n\\nУкажи: (1) что изменилось по типам issues, (2) основные ошибки и самые частые темы с чем они могут быть связаны, (3) на что обратить внимание на следующей неделе. пункты раздели абзацами. твоя задача агрегировать, поэтому не надо в точности переписывать ишью, нужно обобщение по темам, если есть выделяющаяся проблема, ее можно отдельно подсветить. Пиши по-русски, без лишней болтовни.\\n\\nДАННЫЕ:\\n{{ $json.aiContext }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        2960,
+        1648
+      ],
+      "id": "bb1cca87-679b-4786-b6b5-04fd4c33af29",
+      "name": "AI Weekly Comment"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2960,
+        1776
+      ],
+      "id": "55288444-84ba-40d2-9548-10008b2926cb",
+      "name": "Chat Model (OpenAI)",
+      "credentials": {
+        "openAiApi": {
+          "id": "HJHuQ3ultSngKGhI",
+          "name": "OpenAI account 887"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Assemble final HTML with AI comment (supports merged single-input or two-inputs)\n\nfunction isObject(v){ return v && typeof v === 'object'; }\nfunction pickAI(obj){ if (!isObject(obj)) return false; return Boolean(obj.text || obj.output || obj.message); }\nfunction pickBase(obj){ if (!isObject(obj)) return false; return Boolean(obj.html || obj.perType || obj.perTypeObj || obj.table === 'weekly'); }\n\n// Try merged single-input first (items array may contain base+ai)\nconst arr = items.map(it => it?.json || {});\nlet base = arr.find(pickBase) || {};\nlet ai = arr.find(pickAI) || {};\n\n// Fallback: if AI not found in same input, try secondary input (old wiring)\nif (!pickAI(ai)) {\n  const aiItems = $input.all(1);\n  ai = (aiItems[0] && aiItems[0].json) || {};\n}\n\nconst aiText = ai.text || ai.output || ai.message || '';\nconst addAi = aiText ? `\\n  <h3>AI-комментарий недели</h3>\\n  <div>${String(aiText).replaceAll('\\n','<br>')}</div>\\n` : '';\nconst htmlWithAi = (base.html || '') + addAi;\n\nreturn [{ json: { ...base, aiComment: aiText, htmlWithAi } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3456,
+        1568
+      ],
+      "id": "58231950-59a9-41b0-9ccf-a7fda69d598a",
+      "name": "Assemble Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "const annotateType = 'bug';\nfunction extractAuthor(obj) { const u = obj.user || {}; return u.login || 'unknown'; }\nfunction pick(issue){ return {\n  type: annotateType,\n  author: extractAuthor(issue),\n  title: issue.title || '',\n  body: issue.body || '',\n  number: issue.number || null,\n  url: issue.html_url || issue.url || ''\n}; }\nlet out = [];\nif (items.length === 1 && Array.isArray(items[0].json?.items)) {\n  for (const issue of items[0].json.items) { out.push({ json: pick(issue) }); }\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1232
+      ],
+      "id": "8d3b9662-251b-4e54-ab8a-2c64dd58de6f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const annotateType = 'task';\nfunction extractAuthor(obj) { const u = obj.user || {}; return u.login || 'unknown'; }\nfunction pick(issue){ return {\n  type: annotateType,\n  author: extractAuthor(issue),\n  title: issue.title || '',\n  body: issue.body || '',\n  number: issue.number || null,\n  url: issue.html_url || issue.url || ''\n}; }\nlet out = [];\nif (items.length === 1 && Array.isArray(items[0].json?.items)) {\n  for (const issue of items[0].json.items) { out.push({ json: pick(issue) }); }\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1392
+      ],
+      "id": "caaebd70-e2b6-486b-97be-ec99c31a4a1f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const annotateType = 'feature';\nfunction extractAuthor(obj) { const u = obj.user || {}; return u.login || 'unknown'; }\nfunction pick(issue){ return {\n  type: annotateType,\n  author: extractAuthor(issue),\n  title: issue.title || '',\n  body: issue.body || '',\n  number: issue.number || null,\n  url: issue.html_url || issue.url || ''\n}; }\nlet out = [];\nif (items.length === 1 && Array.isArray(items[0].json?.items)) {\n  for (const issue of items[0].json.items) { out.push({ json: pick(issue) }); }\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1552
+      ],
+      "id": "e4a89543-3111-4fac-842d-0dc7e4b436bb",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const annotateType = 'needs-triage';\nfunction extractAuthor(obj) { const u = obj.user || {}; return u.login || 'unknown'; }\nfunction pick(issue){ return {\n  type: annotateType,\n  author: extractAuthor(issue),\n  title: issue.title || '',\n  body: issue.body || '',\n  number: issue.number || null,\n  url: issue.html_url || issue.url || ''\n}; }\nlet out = [];\nif (items.length === 1 && Array.isArray(items[0].json?.items)) {\n  for (const issue of items[0].json.items) { out.push({ json: pick(issue) }); }\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1712
+      ],
+      "id": "f7414f8e-04ea-4a34-869b-ef1dde4366ea",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "fromEmail": "aleksey2mar@gmail.com",
+        "toEmail": "marenin7alex@gmail.com",
+        "subject": "=еженедельный дайджест issue",
+        "html": "={{ $json.htmlWithAi }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        3600,
+        1568
+      ],
+      "id": "90922bf6-7901-41d0-9546-7013ef34db13",
+      "name": "Send an Email",
+      "webhookId": "5e5d8592-243d-47df-82dc-a3f57f584caf",
+      "credentials": {
+        "smtp": {
+          "id": "jfCQ7yUp08Q1cRNG",
+          "name": "SMTP account 33"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        1568
+      ],
+      "id": "39af26b0-8494-427c-8e6e-0314cb714de2",
+      "name": "Merge all1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Compute Range": {
+      "main": [
+        [
+          {
+            "node": "Issues bug",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Issues task",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Issues feature",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Issues triage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DT Get last",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Owner/Repo": {
+      "main": [
+        [
+          {
+            "node": "Compute Range",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issues bug": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issues task": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issues feature": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issues triage": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge bug+task": {
+      "main": [
+        [
+          {
+            "node": "Merge all",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge feat+triage": {
+      "main": [
+        [
+          {
+            "node": "Merge all",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge all": {
+      "main": [
+        [
+          {
+            "node": "Group stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group stats": {
+      "main": [
+        [
+          {
+            "node": "Join current + last",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Join current + last": {
+      "main": [
+        [
+          {
+            "node": "Compute Δ & HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Δ & HTML": {
+      "main": [
+        [
+          {
+            "node": "Build AI Context",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DT Insert current",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge all1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI Context": {
+      "main": [
+        [
+          {
+            "node": "AI Weekly Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Email": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge bug+task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Merge bug+task",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Merge feat+triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Merge feat+triage",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Weekly Comment": {
+      "main": [
+        [
+          {
+            "node": "Merge all1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "DT Get last": {
+      "main": [
+        [
+          {
+            "node": "Join current + last",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Chat Model (OpenAI)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Weekly Comment",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge all1": {
+      "main": [
+        [
+          {
+            "node": "Assemble Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "da98690d-03e5-40f0-972e-b3b85a0621fa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f4300700b5a89163b88ad6a908ff9e3076c705e8b03a3f40f03ff2f29f7e4289"
+  },
+  "nodeGroups": [],
+  "id": "uSamVMa6Ul5R6to4",
+  "tags": []
+}
